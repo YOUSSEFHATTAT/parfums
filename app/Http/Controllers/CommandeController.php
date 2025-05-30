@@ -46,6 +46,8 @@ class CommandeController extends Controller
                 'produit' => $item['titre'],
                 'quantite' => $item['quantite'],
                 'prix_unitaire' => $item['prix'],
+                'categorie' => $item['categorie'],
+                'taille' => $item['taille'],
             ]);
         }
 
@@ -63,8 +65,13 @@ class CommandeController extends Controller
     {
         $commande = Commande::findOrFail($id);
         $commande->statut = $request->statut;
+        
+        if ($request->statut === 'annulée') {
+            $commande->delete();
+            return redirect()->back()->with('success', 'Commande annulée et supprimée avec succès.');
+        }
+        
         $commande->save();
-
         return redirect()->back()->with('success', 'Statut mis à jour avec succès.');
     }
    public function mesCommandes() 

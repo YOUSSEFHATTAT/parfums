@@ -4,6 +4,7 @@ use App\Http\Controllers\produitsController;
 use App\Http\Controllers\panierController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\contactController;
+use App\Http\Controllers\UserController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,6 @@ Route::middleware(['auth.required'])->group(function () {
     Route::post('/panier/ajouter/{id}', [PanierController::class, 'ajouter'])->name('panier.ajouter');
     Route::post('/panier/supprimer/{id}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
     Route::post('/panier/update/{id}', [PanierController::class, 'update'])->name('panier.update');
-
     Route::get('/commande', [CommandeController::class, 'form'])->name('commande.form');
     Route::post('/commande', [CommandeController::class, 'submit'])->name('commande.submit');
     Route::get('/mes-commandes', [CommandeController::class, 'mesCommandes'])->name('mes.commandes');
@@ -56,8 +56,14 @@ Route::middleware(['auth.required', 'admin'])->group(function () {
     Route::delete('/supprimer/{produit}', [App\Http\Controllers\produitsController::class, 'supprimer'])->name('supprimer');
     Route::get('/modifier/{produit}/edit', [App\Http\Controllers\produitsController::class, 'modifierform'])->name('modifier');
     Route::put('/modifier/{produit}', [App\Http\Controllers\produitsController::class, 'modifier'])->name('modifier.produit');
+    Route::get('/users', [userController::class, 'usersliste'])->name('usersliste');
+    Route::post('/users/{id}/role', [userController::class, 'updateRole'])->name('users.updateRole');
+    
 
     // Commandes
     Route::get('/commandes', [CommandeController::class, 'listeCommandes'])->name('commandes.liste');
     Route::put('/commande/{id}/statut', [CommandeController::class, 'updateStatut'])->name('commande.update.statut');
 });
+
+
+

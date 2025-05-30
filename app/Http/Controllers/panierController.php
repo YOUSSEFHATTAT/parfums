@@ -42,7 +42,9 @@ class PanierController extends Controller
                 'titre' => $produit->titre,
                 'prix' => $produit->prix,
                 'quantite' => $quantite,
-                'image' => $produit->image
+                'image' => $produit->image,
+                'categorie' => $produit->categorie,
+                'taille' => $produit->taille,
             ];
         }
 

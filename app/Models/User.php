@@ -57,6 +57,31 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Vérifie si l'utilisateur est superadmin
+     */
+    public function isSuperAdmin()
+    {
+        return $this->role === 'superadmin';
+    }
+
+    /**
+     * Vérifie si l'utilisateur peut modifier les rôles
+     */
+    public function canManageRoles()
+    {
+        return $this->isSuperAdmin();
+    }
+
+    /**
+     * Vérifie si l'utilisateur peut modifier le rôle d'un autre utilisateur
+     */
+    public function canModifyUserRoles(User $user)
+    {
+        return $this->canManageRoles();
+    }
+
     public function getAuthPassword()
     {
         return $this->mot_de_passe;

@@ -69,4 +69,26 @@ class userController extends Controller
         Auth::logout();
         return redirect()->route('connexion')->with('success', 'Vous avez été déconnecté.');
      }
-}
+     
+     public function usersliste(Request $request) {
+        $searchTerm = $request->input('search');
+        
+        $users = Utilisateur::when($searchTerm, function ($query) use ($searchTerm) {
+            return $query->where(function($q) use ($searchTerm) {
+                $q->where('nom', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%');
+            });
+        })->paginate(10);
+
+        return view('users', compact('users', 'searchTerm'));
+     }
+
+     public function updateRole(Request $request, $id)
+     {
+        $user = Utilisateur::findOrFail($id);
+        $user->role = $request->role;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Rôle mis à jour avec succès');
+     }
+    }

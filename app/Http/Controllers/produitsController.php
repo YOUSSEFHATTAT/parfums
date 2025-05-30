@@ -7,50 +7,54 @@ use Illuminate\Http\Request;
 
 class produitsController extends Controller
 {
-public function add()
-{
-
-    return view('ajouterproduit');
-}
-
-
-public function store(Request $request)
-{
-    $request->validate([
-        'titre' => 'required|string|max:255|unique:produits,titre',
-        'description' => 'required|string|max:1000',
-        'prix' => 'required|numeric|min:0',
-        'quantite' => 'required|integer|min:1',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
-    ]);
-        $titre = $request->titre;
-        $description = $request->description;
-        $prix = $request->prix;
-        $quantite = $request->quantite;
-        $image =$request->file('image')->store('produit', 'public');
+    public function index(Request $request)
+    {
+        $query = produits::query();
         
-;
+        // Recherche par titre
+        if ($request->filled('search')) {
+            $query->where('titre', 'like', '%' . $request->search . '%');
+        }
+        
+        // Filtre par catégorie
+        if ($request->filled('categorie')) {
+            $query->where('categorie', $request->categorie);
+        }
+        
+        $produits = $query->paginate(10);
+        
+        return view('produits', compact('produits'));
+    }
 
-        produits::create([
-        'titre' => $titre,
-        'description' => $description,
-        'prix' => $prix,
-        'quantite' => $quantite,
-        'image' => $image,
-    ]);
+    public function add()
+    {
+        return view('ajouterproduit');
+    }
 
-    return redirect()->route('produits.index')->with('success', 'Produit ajouté avec succès.');
-}
+    public function store(Request $request)
+    {
+        $request->validate([
+            'titre' => 'required|string|max:255|unique:produits,titre',
+            'description' => 'required|string|max:1000',
+            'prix' => 'required|numeric|min:0',
+            'quantite' => 'required|integer|min:1',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
+            'categorie' => 'required|string',
+            'taille' => 'required|string',
+        ]);
 
+        $produit = produits::create([
+            'titre' => $request->titre,
+            'description' => $request->description,
+            'prix' => $request->prix,
+            'quantite' => $request->quantite,
+            'image' => $request->file('image')->store('produit', 'public'),
+            'categorie' => $request->categorie,
+            'taille' => $request->taille,
+        ]);
 
-
-public function index()
-{
-    
-    $produits = produits::paginate(8);
-
-    return view('produits', compact('produits'));
-}
+        return redirect()->route('produits.index')->with('success', 'Produit ajouté avec succès.');
+    }
 
 public function show(produits $produit)
 {
@@ -77,6 +81,8 @@ public function modifier(produits $produit, Request $request)
         'prix' => 'required|numeric|min:0',
         'quantite' => 'required|integer|min:1',
         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
+        'categorie' => 'required|string',
+        'taille' => 'required|string',
     ]);
 
     $data = [
@@ -84,6 +90,8 @@ public function modifier(produits $produit, Request $request)
         'description' => $request->description,
         'prix' => $request->prix,
         'quantite' => $request->quantite,
+        'categorie' => $request->categorie,
+        'taille' => $request->taille,
     ];
 
     if ($request->hasFile('image')) {
